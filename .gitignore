@@ -1,0 +1,46 @@
+# ==============================
+# CORPUS
+# ==============================
+
+corpus/global_telecom/
+corpus/evaluate/
+corpus/enterprise/
+
+
+# ==============================
+# FICHIERS PRIVÉS
+# ==============================
+
+private.txt
+
+
+# ==============================
+# ENVIRONNEMENT PYTHON
+# ==============================
+
+venv/
+.venv/
+env/
+env.bak/
+
+*.py[cod]
+__pycache__/
+
+
+# ==============================
+# DONNÉES GÉNÉRÉES
+# ==============================
+
+tekis-backend/data/chroma/
+tekis-backend/data/documents/
+tekis-backend/venv/
+
+
+# ==============================
+# FICHIERS TEMPORAIRES
+# ==============================
+
+*.tmp
+*.temp
+*.zip
+~$*

@@ -1,0 +1,134 @@
+/* TEKIS — Composants partagés (basés sur DESIGN1/DESIGN2/DESIGN3.md) */
+
+/* --- Coquille applicative --- */
+.tk-sidebar {
+  position: fixed; top: 0; bottom: 0; left: 0; width: 260px;
+  background-color: var(--color-surface-raised);
+  border-right: 1px solid var(--color-border);
+  display: flex; flex-direction: column; padding: 2rem 0;
+  z-index: 50;
+  transition: transform .2s ease, background-color .2s ease;
+}
+@media (max-width: 767px) {
+  .tk-sidebar { transform: translateX(-100%); box-shadow: var(--shadow-modal); }
+  .tk-sidebar.open { transform: translateX(0); }
+}
+
+.tk-topbar {
+  position: fixed; top: 0; right: 0; left: 0; height: 4rem;
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.5rem; z-index: 40;
+}
+@media (min-width: 768px) { .tk-topbar { left: 260px; } }
+
+.tk-main { padding-top: 4rem; min-height: 100%; }
+@media (min-width: 768px) { .tk-main { margin-left: 260px; } }
+
+/* --- Navigation --- */
+.tk-nav-link {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .5rem .75rem; margin: 0 .75rem;
+  border-radius: .125rem;
+  color: var(--color-text-subtle);
+  border-left: 2px solid transparent;
+  font-size: .875rem;
+  transition: background-color .15s ease, color .15s ease;
+}
+.tk-nav-link:hover { background-color: var(--color-container-highest); color: var(--color-primary); }
+.tk-nav-link.active {
+  color: var(--color-primary); font-weight: 700;
+  border-left-color: var(--color-primary);
+  background-color: var(--color-container-high);
+}
+.tk-nav-link .material-symbols-outlined { font-size: 20px; }
+
+/* --- Boutons --- */
+.tk-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  padding: .55rem 1.1rem; border-radius: .125rem; font-size: .875rem; font-weight: 600;
+  border: 1px solid transparent; transition: opacity .15s ease, background-color .15s ease;
+}
+.tk-btn-primary { background-color: var(--color-primary); color: var(--color-on-primary); }
+.tk-btn-primary:hover { opacity: .9; }
+.tk-btn-secondary { background-color: transparent; color: var(--color-text); border-color: var(--color-border); }
+.tk-btn-secondary:hover { background-color: var(--color-surface-panel); }
+.tk-btn-ghost { background: transparent; color: var(--color-text-subtle); border: none; }
+.tk-btn-ghost:hover { color: var(--color-primary); }
+
+.tk-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2.25rem; height: 2.25rem; border-radius: .25rem;
+  color: var(--color-text-subtle); background: transparent; border: none;
+  transition: color .15s ease, background-color .15s ease;
+}
+.tk-icon-btn:hover { color: var(--color-primary); background-color: var(--color-surface-panel); }
+
+/* --- Cartes / stats --- */
+.tk-card { background-color: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: .25rem; }
+.tk-stat { background-color: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: .25rem; padding: 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
+.tk-stat-label { font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; color: var(--color-text-subtle); font-weight: 700; }
+.tk-stat-value { font-size: 2rem; font-weight: 600; letter-spacing: -.02em; color: var(--color-text); }
+
+/* --- Fil de discussion --- */
+.tk-chat-container { width: 100%; max-width: 800px; margin: 0 auto; }
+.tk-bubble-user { background-color: var(--color-surface-panel); border: 1px solid var(--color-border); border-radius: .5rem .5rem 0 .5rem; padding: 1rem; max-width: 85%; }
+.tk-bubble-ai { max-width: 90%; }
+.tk-source-chip {
+  display: inline-flex; align-items: center; gap: .4rem; padding: .45rem .75rem;
+  border: 1px solid var(--color-border); border-radius: .25rem;
+  background-color: var(--color-surface-panel); font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem; color: var(--color-text); transition: background-color .15s ease;
+}
+.tk-source-chip:hover { background-color: var(--color-container-highest); }
+
+/* --- Tableaux --- */
+.tk-table { width: 100%; border-collapse: collapse; text-align: left; }
+.tk-table thead { background-color: var(--color-container-high); border-bottom: 1px solid var(--color-border); }
+.tk-table th { padding: .9rem 1.25rem; font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; color: var(--color-text-subtle); font-weight: 700; }
+.tk-table td { padding: .9rem 1.25rem; border-bottom: 1px solid var(--color-border); font-size: .875rem; color: var(--color-text); }
+.tk-table tbody tr { transition: background-color .15s ease; }
+.tk-table tbody tr:hover { background-color: var(--color-surface-panel); }
+.tk-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem; padding: .2rem .55rem; border-radius: .25rem;
+  background-color: var(--color-surface-panel); border: 1px solid var(--color-border); color: var(--color-text-muted);
+}
+.tk-status-dot { width: .5rem; height: .5rem; border-radius: 9999px; display: inline-block; }
+.tk-status-dot.active { background-color: var(--color-success); }
+.tk-status-dot.inactive { background-color: var(--color-border-strong); }
+
+/* --- Formulaires --- */
+.tk-field { display: flex; flex-direction: column; gap: .35rem; }
+.tk-field label { font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); }
+.tk-input-wrap {
+  position: relative; display: flex; align-items: center;
+  background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: .125rem;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tk-input-wrap:focus-within { border-color: var(--color-primary); box-shadow: 0 0 0 1px var(--color-primary); }
+.tk-input-wrap .material-symbols-outlined { position: absolute; left: .75rem; color: var(--color-text-subtle); font-size: 20px; pointer-events: none; }
+.tk-input-wrap input, .tk-input-wrap textarea {
+  width: 100%; background: transparent; border: none; outline: none; color: var(--color-text);
+  padding: .75rem .75rem .75rem 2.5rem; font-size: .875rem;
+}
+.tk-input-wrap textarea { resize: none; }
+
+/* --- Connexion --- */
+.tk-modal { width: 100%; max-width: 26rem; background-color: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: .75rem; overflow: hidden; box-shadow: var(--shadow-modal); }
+
+/* --- Page publique --- */
+.tk-hero-input { display: flex; align-items: center; background-color: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: .5rem; padding: .5rem; box-shadow: var(--shadow-ambient); }
+.tk-pill { display: inline-flex; align-items: center; gap: .5rem; padding: .3rem .8rem; border: 1px solid var(--color-border); border-radius: 9999px; background-color: var(--color-surface-panel); font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; color: var(--color-text-subtle); }
+
+/* --- Rôles typographiques --- */
+.tk-headline-lg { font-size: 2rem; line-height: 1.2; letter-spacing: -.02em; font-weight: 600; }
+.tk-headline-md { font-size: 1.25rem; line-height: 1.4; letter-spacing: -.01em; font-weight: 600; }
+.tk-body-lg { font-size: 1rem; line-height: 1.6; }
+.tk-body-md { font-size: .875rem; line-height: 1.5; }
+.tk-label-caps { font-size: .6875rem; letter-spacing: .05em; font-weight: 700; text-transform: uppercase; }
+.tk-label-sm { font-family: 'JetBrains Mono', monospace; font-size: .75rem; }
+
+/* --- État vide --- */
+.tk-empty { display: flex; flex-direction: column; align-items: flex-start; gap: .75rem; max-width: 32rem; }
+.tk-empty .material-symbols-outlined { font-size: 40px; color: var(--color-text-subtle); }

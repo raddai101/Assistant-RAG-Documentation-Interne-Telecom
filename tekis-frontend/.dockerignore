@@ -1,0 +1,11 @@
+.git/
+.gitignore
+
+node_modules/
+
+*.log
+
+.vscode/
+.idea/
+
+README.md

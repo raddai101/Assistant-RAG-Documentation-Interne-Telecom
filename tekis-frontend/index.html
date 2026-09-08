@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEKIS — Interrogez votre documentation télécom</title>
+<script src="assets/js/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/js/tailwind-config.js"></script>
+</head>
+<body class="bg-bg text-text font-sans antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 left-0 w-full h-16 backdrop-blur-md border-b border-border z-50 flex items-center justify-between px-gutter" style="background-color: color-mix(in srgb, var(--color-bg) 85%, transparent);">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+      <span class="material-symbols-outlined text-on-primary" style="font-size:18px;">hub</span>
+    </div>
+    <span class="tk-headline-md">TEKIS</span>
+  </div>
+  <nav class="hidden md:flex items-center gap-6">
+    <a class="tk-label-caps text-text-subtle hover:text-primary transition-colors" href="#produit">Produit</a>
+    <a class="tk-label-caps text-text-subtle hover:text-primary transition-colors" href="#solutions">Solutions</a>
+    <a class="tk-label-caps text-text-subtle hover:text-primary transition-colors" href="documentation.html">Documentation</a>
+    <div class="w-px h-4 bg-border mx-1"></div>
+    <button class="tk-icon-btn" onclick="toggleTheme()" aria-label="Changer de thème">
+      <span class="material-symbols-outlined" data-theme-icon>dark_mode</span>
+    </button>
+    <a class="tk-btn tk-btn-secondary" href="login.html">Connexion</a>
+    <a class="tk-btn tk-btn-primary" href="login.html">Commencer</a>
+  </nav>
+  <div class="flex items-center gap-2 md:hidden">
+    <button class="tk-icon-btn" onclick="toggleTheme()" aria-label="Changer de thème">
+      <span class="material-symbols-outlined" data-theme-icon>dark_mode</span>
+    </button>
+    <a class="tk-btn tk-btn-primary" href="login.html">Connexion</a>
+  </div>
+</header>
+
+<main class="flex-grow pt-24 px-margin-mobile md:px-margin-page flex flex-col items-center max-w-[1200px] mx-auto w-full">
+
+  <section id="produit" class="w-full flex flex-col items-center text-center mt-12 mb-20 max-w-max-width-chat">
+    <div class="tk-pill mb-6">
+      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+      v2.4.0 — Aperçu technique
+    </div>
+    <h1 class="text-3xl md:text-[40px] leading-[1.15] font-semibold tracking-tight text-text mb-4">
+      Interrogez votre documentation télécom instantanément.
+    </h1>
+    <p class="tk-body-lg text-text-subtle max-w-2xl mb-2">
+      Un assistant conçu pour les infrastructures réseau. TEKIS retrouve, contextualise et
+      cite vos procédures techniques, contrats et journaux d'exploitation — jamais sans preuve.
+    </p>
+
+    <div class="w-full max-w-3xl mt-8">
+      <div class="tk-hero-input">
+        <span class="material-symbols-outlined ml-3 mr-2 text-text-subtle">search</span>
+        <input class="flex-1 bg-transparent border-none outline-none text-text py-3" type="text"
+          placeholder="Comment configurer le routage BGP sur le commutateur central ?">
+        <a href="login.html" class="tk-btn tk-btn-primary whitespace-nowrap">Rechercher</a>
+      </div>
+      <div class="flex items-center justify-center gap-6 mt-5 text-text-subtle tk-label-sm">
+        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">check_circle</span> Temps de réponse &lt; 2s</span>
+        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">check_circle</span> Chiffrement de bout en bout</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="solutions" class="w-full mb-24">
+    <h2 class="tk-headline-md text-center mb-8">Capacités techniques</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="tk-card p-6 flex flex-col h-full">
+        <div class="w-12 h-12 bg-container-high rounded flex items-center justify-center mb-6">
+          <span class="material-symbols-outlined text-primary text-2xl">bolt</span>
+        </div>
+        <h3 class="tk-headline-md mb-2">Réponses rapides</h3>
+        <p class="tk-body-md text-text-subtle flex-grow">
+          Recherche hybride (lexicale + sémantique) optimisée pour la terminologie télécom et les identifiants techniques.
+        </p>
+        <div class="mt-6 pt-6 border-t border-border flex items-center justify-between tk-label-sm">
+          <span class="text-text-subtle">Latence P99</span>
+          <span class="text-text font-bold">1.2 s</span>
+        </div>
+      </div>
+      <div class="tk-card p-6 flex flex-col h-full">
+        <div class="w-12 h-12 bg-container-high rounded flex items-center justify-center mb-6">
+          <span class="material-symbols-outlined text-primary text-2xl">library_books</span>
+        </div>
+        <h3 class="tk-headline-md mb-2">Sources citées</h3>
+        <p class="tk-body-md text-text-subtle flex-grow">
+          Chaque réponse pointe vers vos documents sources. Pas de citation, pas de réponse.
+        </p>
+        <div class="mt-6 pt-6 border-t border-border flex gap-2">
+          <span class="tk-tag">PDF</span>
+          <span class="tk-tag">Confluence</span>
+          <span class="tk-tag">Jira</span>
+        </div>
+      </div>
+      <div class="tk-card p-6 flex flex-col h-full">
+        <div class="w-12 h-12 bg-container-high rounded flex items-center justify-center mb-6">
+          <span class="material-symbols-outlined text-primary text-2xl">shield_lock</span>
+        </div>
+        <h3 class="tk-headline-md mb-2">Sécurité entreprise</h3>
+        <p class="tk-body-md text-text-subtle flex-grow">
+          Contrôle d'accès par rôle (RBAC) : les résultats sont filtrés avant même d'atteindre le modèle.
+        </p>
+        <div class="mt-6 pt-6 border-t border-border flex items-center gap-2 tk-label-sm text-text-subtle">
+          <span class="material-symbols-outlined text-[18px] text-primary">verified</span>
+          Conforme SOC2 &amp; ISO 27001
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="w-full border-t border-border py-8 px-gutter mt-auto">
+  <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <span class="tk-label-caps text-text-subtle">© 2024 TEKIS — Telecom Enterprise Knowledge Intelligence System</span>
+    <div class="flex gap-6">
+      <a class="tk-label-sm text-text-subtle hover:text-primary" href="#">Confidentialité</a>
+      <a class="tk-label-sm text-text-subtle hover:text-primary" href="#">Conditions</a>
+      <a class="tk-label-sm text-text-subtle hover:text-primary" href="#">Statut API</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

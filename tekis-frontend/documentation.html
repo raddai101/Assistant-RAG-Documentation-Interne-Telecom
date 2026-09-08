@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentation — TEKIS</title>
+<script src="assets/js/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/js/tailwind-config.js"></script>
+</head>
+<body data-page="documentation" class="bg-bg text-text font-sans antialiased min-h-screen">
+
+<nav class="tk-sidebar">
+  <div class="px-6 mb-8 flex items-center gap-3">
+    <div class="w-9 h-9 rounded bg-primary flex items-center justify-center">
+      <span class="material-symbols-outlined text-on-primary" style="font-size:20px;">hub</span>
+    </div>
+    <div>
+      <p class="font-semibold text-text leading-tight">TEKIS</p>
+      <p class="text-[11px] text-text-subtle">Telecom RAG Assistant</p>
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-1">
+    <a href="chat.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">add_comment</span>Nouvelle Discussion</a>
+    <a href="historique.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">history</span>Historique</a>
+    <a href="documentation.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">description</span>Documentation</a>
+    <a href="parametres.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">settings</span>Paramètres</a>
+    <a href="administration.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">admin_panel_settings</span>Administration</a>
+    <a href="gestion-acl.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">security</span>Gestion des ACL</a>
+  </div>
+  <div class="px-6 pt-4 mt-4 border-t border-border flex items-center gap-3">
+    <div class="w-8 h-8 rounded-full bg-container-highest flex items-center justify-center text-sm font-semibold">JD</div>
+    <div class="overflow-hidden">
+      <p class="truncate text-sm font-medium" data-user-label>Utilisateur</p>
+        <p class="truncate text-xs text-text-subtle" data-user-email>utilisateur@tekis.local</p>
+    </div>
+  </div>
+</nav>
+
+<header class="tk-topbar">
+  <div class="flex items-center gap-3">
+    <button class="tk-icon-btn md:hidden" data-menu-toggle aria-label="Ouvrir le menu"><span class="material-symbols-outlined">menu</span></button>
+    <span class="font-semibold">Documentation</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <button class="tk-icon-btn" onclick="toggleTheme()" aria-label="Changer de thème">
+      <span class="material-symbols-outlined" data-theme-icon>dark_mode</span>
+    </button>
+    <button class="tk-icon-btn"><span class="material-symbols-outlined">notifications</span></button>
+    <button class="tk-icon-btn"><span class="material-symbols-outlined">account_circle</span></button>
+  </div>
+</header>
+
+<main class="tk-main p-margin-mobile md:p-margin-page" style="min-height: calc(100vh - 4rem);">
+  <div class="max-w-[900px] mx-auto w-full">
+    <div class="mb-8">
+      <h1 class="tk-headline-lg mb-2">Documentation</h1>
+      <p class="tk-body-lg text-text-subtle">Ajoutez les documents de référence au corpus TEKIS.</p>
+      <p id="apiStatus" class="tk-label-sm mt-3">Vérification de l'API...</p>
+    </div>
+    <section id="adminUploadPanel" class="tk-card p-6" hidden>
+      <div class="flex items-center gap-3 mb-5">
+        <span class="material-symbols-outlined text-primary">upload_file</span>
+        <div><h2 class="tk-headline-md">Importer dans le corpus entreprise</h2><p class="text-sm text-text-subtle">Cette action est réservée aux administrateurs.</p></div>
+      </div>
+      <form id="documentationUploadForm" class="grid gap-4 md:grid-cols-2">
+        <label class="tk-field md:col-span-2"><span>Fichier</span><input type="file" name="file" accept=".pdf,.docx,.xlsx,.txt" required></label>
+        <label class="tk-field"><span>Titre</span><input type="text" name="title" placeholder="Titre du document" required></label>
+        <label class="tk-field"><span>Département</span><select name="department_id" id="departmentSelect" required><option value="">Chargement...</option></select></label>
+        <label class="tk-field md:col-span-2"><span>Classification</span><select name="classification"><option value="enterprise">Entreprise</option><option value="confidential">Confidentiel</option><option value="internal">Interne</option></select></label>
+        <p id="documentationStatus" class="text-sm min-h-[20px] md:col-span-2" aria-live="polite"></p>
+        <button type="submit" class="tk-btn tk-btn-primary md:col-span-2"><span class="material-symbols-outlined">cloud_upload</span>Uploader le document</button>
+      </form>
+    </section>
+    <div class="mt-6 flex justify-end"><a href="chat.html" class="tk-btn tk-btn-secondary">Retour à la discussion</a></div>
+  </div>
+</main>
+
+<script src="assets/js/tekis-app.js"></script>
+<script src="assets/js/nav.js"></script>
+</body>
+</html>

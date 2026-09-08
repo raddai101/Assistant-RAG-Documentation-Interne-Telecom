@@ -1,0 +1,82 @@
+/* =========================================================
+   TEKIS — Design Tokens (généré depuis DESIGN1.md / DESIGN2.md)
+   Un seul jeu de variables : :root = thème clair, html.dark = thème sombre
+   ========================================================= */
+
+:root {
+  --color-bg: #f9f9f9;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f9fafb;
+  --color-surface-panel: #f3f3f3;
+  --color-container: #eeeeee;
+  --color-container-high: #e8e8e8;
+  --color-container-highest: #e2e2e2;
+
+  --color-border: #e5e7eb;
+  --color-border-strong: #7e7576;
+
+  --color-text: #1b1b1b;
+  --color-text-muted: #5e6572;
+  --color-text-subtle: #9ca3af;
+
+  --color-primary: #000000;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1b1b1b;
+  --color-on-primary-container: #848484;
+
+  --color-secondary: #585f6c;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #dce2f3;
+  --color-on-secondary-container: #5e6572;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-success: #1a7d3a;
+
+  --shadow-ambient: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.12);
+
+  color-scheme: light;
+}
+
+html.dark {
+  --color-bg: #0a0a0a;
+  --color-surface: #131313;
+  --color-surface-raised: #121212;
+  --color-surface-panel: #1e1e1e;
+  --color-container: #201f1f;
+  --color-container-high: #2a2a2a;
+  --color-container-highest: #353534;
+
+  --color-border: #262626;
+  --color-border-strong: #8e9192;
+
+  --color-text: #e5e2e1;
+  --color-text-muted: #b4b9bf;
+  --color-text-subtle: #9ca3af;
+
+  --color-primary: #ffffff;
+  --color-on-primary: #2f3131;
+  --color-primary-container: #e2e2e2;
+  --color-on-primary-container: #636565;
+
+  --color-secondary: #c3c7cd;
+  --color-on-secondary: #2c3136;
+  --color-secondary-container: #454a4f;
+  --color-on-secondary-container: #b4b9bf;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+
+  --color-success: #6fd196;
+
+  --shadow-ambient: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}

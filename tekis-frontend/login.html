@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — TEKIS</title>
+<script src="assets/js/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/js/tailwind-config.js"></script>
+</head>
+<body data-page="login" class="bg-bg text-text font-sans antialiased min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-page">
+
+<button class="tk-icon-btn fixed top-4 right-4 md:top-6 md:right-6 z-20" onclick="toggleTheme()" aria-label="Changer de thème">
+  <span class="material-symbols-outlined" data-theme-icon>dark_mode</span>
+</button>
+
+<div class="tk-modal">
+  <div class="p-gutter flex flex-col items-center border-b border-border bg-surface-panel text-center">
+    <div class="w-14 h-14 rounded-full bg-bg flex items-center justify-center border border-border mb-stack-md overflow-hidden">
+      <span class="material-symbols-outlined text-primary" style="font-size:26px;">cell_tower</span>
+    </div>
+    <h1 class="tk-headline-md text-text">Bienvenue sur TEKIS</h1>
+    <p class="tk-body-md text-text-subtle mt-1">Connectez-vous pour interroger la mémoire documentaire de l'entreprise.</p>
+  </div>
+
+  <div class="p-gutter">
+    <form id="loginForm" class="flex flex-col gap-stack-md">
+      <div class="tk-field">
+        <label for="email">Identifiant entreprise</label>
+        <div class="tk-input-wrap">
+          <span class="material-symbols-outlined">mail</span>
+          <input id="email" name="email" type="email" placeholder="nom.prenom@telecom.net" required>
+        </div>
+      </div>
+
+      <div class="tk-field">
+        <div class="flex items-center justify-between">
+          <label for="password">Mot de passe</label>
+          <a class="tk-label-sm text-text-subtle hover:text-primary transition-colors" href="#">Oublié ?</a>
+        </div>
+        <div class="tk-input-wrap">
+          <span class="material-symbols-outlined">lock</span>
+          <input id="password" name="password" type="password" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-stack-sm mt-2">
+        <p id="loginStatus" class="text-sm min-h-[20px]"></p>
+        <button type="submit" class="tk-btn tk-btn-primary w-full">
+          Se connecter
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </button>
+        <button type="button" class="tk-btn tk-btn-secondary w-full">
+          <span class="material-symbols-outlined text-[18px]">key</span>
+          Connexion SSO
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="p-4 bg-surface border-t border-border text-center">
+    <p class="tk-label-sm text-text-subtle">Accès restreint au personnel autorisé.</p>
+  </div>
+</div>
+
+<script src="assets/js/tekis-app.js"></script>
+</body>
+</html>

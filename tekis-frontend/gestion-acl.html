@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion des ACL — TEKIS</title>
+<script src="assets/js/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/js/tailwind-config.js"></script>
+</head>
+<body data-page="acl" class="bg-bg text-text font-sans antialiased min-h-screen">
+
+<nav class="tk-sidebar">
+  <div class="px-6 mb-8 flex items-center gap-3">
+    <div class="w-9 h-9 rounded bg-primary flex items-center justify-center">
+      <span class="material-symbols-outlined text-on-primary" style="font-size:20px;">hub</span>
+    </div>
+    <div>
+      <p class="font-semibold text-text leading-tight">TEKIS</p>
+      <p class="text-[11px] text-text-subtle">Telecom RAG Assistant</p>
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-1">
+    <a href="chat.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">add_comment</span>Nouvelle Discussion</a>
+    <a href="historique.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">history</span>Historique</a>
+    <a href="documentation.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">description</span>Documentation</a>
+    <a href="parametres.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">settings</span>Paramètres</a>
+    <a href="administration.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">admin_panel_settings</span>Administration</a>
+    <a href="gestion-acl.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined filled">security</span>Gestion des ACL</a>
+  </div>
+  <div class="px-6 pt-4 mt-4 border-t border-border flex items-center gap-3">
+    <div class="w-8 h-8 rounded-full bg-container-highest flex items-center justify-center text-sm font-semibold">JD</div>
+    <div class="overflow-hidden">
+      <p class="truncate text-sm font-medium" data-user-label>Utilisateur</p>
+        <p class="truncate text-xs text-text-subtle" data-user-email>utilisateur@tekis.local</p>
+    </div>
+  </div>
+</nav>
+
+<header class="tk-topbar">
+  <div class="flex items-center gap-3">
+    <button class="tk-icon-btn md:hidden" data-menu-toggle aria-label="Ouvrir le menu"><span class="material-symbols-outlined">menu</span></button>
+    <span class="font-semibold">Gestion des ACL</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <div class="tk-input-wrap hidden sm:flex" style="width:16rem;">
+      <span class="material-symbols-outlined">search</span>
+      <input type="text" placeholder="Rechercher...">
+    </div>
+    <button class="tk-icon-btn" onclick="toggleTheme()" aria-label="Changer de thème">
+      <span class="material-symbols-outlined" data-theme-icon>dark_mode</span>
+    </button>
+    <button class="tk-icon-btn"><span class="material-symbols-outlined">notifications</span></button>
+    <button class="tk-icon-btn"><span class="material-symbols-outlined">account_circle</span></button>
+  </div>
+</header>
+
+<main class="tk-main p-margin-mobile md:p-margin-page">
+  <div class="max-w-[1200px] mx-auto">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-stack-md gap-4">
+      <div>
+        <h1 class="tk-headline-lg mb-2">Access Control Lists</h1>
+        <p class="tk-body-md text-text-subtle">Gérez les permissions par rôle et les cibles de ressources.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="button" class="tk-btn tk-btn-secondary" data-acl-filter>
+          <span class="material-symbols-outlined text-sm">filter_list</span> Filtres
+        </button>
+        <button type="button" class="tk-btn tk-btn-primary" data-acl-create>
+          <span class="material-symbols-outlined text-sm">add</span> Nouveau rôle
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-stack-md">
+      <div class="tk-stat">
+        <span class="tk-stat-label">TOTAL RÔLES</span>
+        <span class="tk-stat-value" id="aclRoleCount">0</span>
+      </div>
+      <div class="tk-stat">
+        <span class="tk-stat-label">RESSOURCES ACTIVES</span>
+        <span class="tk-stat-value" id="aclResourceCount">0</span>
+      </div>
+      <div class="tk-stat">
+        <span class="tk-stat-label">DEMANDES EN ATTENTE</span>
+        <span class="tk-stat-value" style="color: var(--color-error);" id="aclPendingCount">0</span>
+      </div>
+    </div>
+
+    <div class="tk-card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="tk-table">
+          <thead>
+            <tr>
+              <th>Rôle</th>
+              <th>Cible de ressource</th>
+              <th>Permissions</th>
+              <th>Utilisateurs</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="aclTableBody">
+            <tr>
+              <td class="font-semibold">Super Admin</td>
+              <td><span class="tk-tag">* (All)</span></td>
+              <td>Read, Write, Delete, Admin</td>
+              <td>4</td>
+              <td class="text-right"><button class="tk-icon-btn" style="width:2rem;height:2rem;"><span class="material-symbols-outlined text-sm">edit</span></button></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Ingénierie Réseau</td>
+              <td><span class="tk-tag">nodes/*, topology/*</span></td>
+              <td>Read, Write</td>
+              <td>24</td>
+              <td class="text-right"><button class="tk-icon-btn" style="width:2rem;height:2rem;"><span class="material-symbols-outlined text-sm">edit</span></button></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Data Scientist</td>
+              <td><span class="tk-tag">models/*, datasets/read</span></td>
+              <td>Read, Execute</td>
+              <td>12</td>
+              <td class="text-right"><button class="tk-icon-btn" style="width:2rem;height:2rem;"><span class="material-symbols-outlined text-sm">edit</span></button></td>
+            </tr>
+            <tr>
+              <td class="font-semibold">Auditeur</td>
+              <td><span class="tk-tag">logs/*</span></td>
+              <td>Read Only</td>
+              <td>8</td>
+              <td class="text-right"><button class="tk-icon-btn" style="width:2rem;height:2rem;"><span class="material-symbols-outlined text-sm">edit</span></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="assets/js/tekis-app.js"></script>
+<script src="assets/js/nav.js"></script>
+</body>
+</html>

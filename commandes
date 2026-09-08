@@ -1,0 +1,49 @@
+#1. PostgreSQL PowerShell
+Get-Service postgresql*
+Start-Service postgresql-x64-18
+
+#2. Ollama 
+ollama serve
+ollama list
+ollama pull bge-m3
+ollama pull qwen3:14b
+
+#3. Backend Flask
+cd C:\Users\Academy\Documents\tekis\tekis-backend
+.\venv\Scripts\Activate.ps1
+python -m flask --app run.py run --host 127.0.0.1 --port 5000
+
+#Backend disponible sur :
+http://127.0.0.1:5000
+
+
+#4. Frontend
+cd C:\Users\Academy\Documents\tekis\tekis-frontend
+py -m http.server 5500 --bind 127.0.0.1
+
+Ouvrir ensuite :
+http://127.0.0.1:5500/login.html
+
+
+#Comptes de connexion
+
+admin@tekis.local
+admin123
+
+nkashamaradda.arc@gmail.com
+raddai101
+
+#Pour réimporter le corpus :
+
+cd C:\Users\Academy\Documents\tekis\tekis-backend
+.\venv\Scripts\python.exe -m scripts.ingest_corpus --corpus "C:\Users\Academy\Documents\tekis\corpus\enterprise"
+
+#Mise en marche
+Set-Location "C:\Users\Academy\Documents\tekis"; if ((Get-Service "postgresql-x64-18" -ErrorAction SilentlyContinue).Status -ne "Running") { Start-Service "postgresql-x64-18" }; if (-not (Get-NetTCPConnection -LocalPort 11434 -State Listen -ErrorAction SilentlyContinue)) { Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden }; if (-not (Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue)) { Start-Process ".\tekis-backend\venv\Scripts\python.exe" -ArgumentList "-m flask --app run.py run --host 127.0.0.1 --port 5000" -WorkingDirectory ".\tekis-backend" -WindowStyle Hidden }; if (-not (Get-NetTCPConnection -LocalPort 5500 -State Listen -ErrorAction SilentlyContinue)) { Start-Process "py" -ArgumentList "-m http.server 5500 --bind 127.0.0.1" -WorkingDirectory ".\tekis-frontend" -WindowStyle Hidden }; Start-Process "http://127.0.0.1:5500/login.html"
+
+#L’application sera accessible ici : 
+http://127.0.0.1:5500/login.html
+
+#Pour arrêter les serveurs :
+Get-NetTCPConnection -LocalPort 5000,5500 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique | Stop-Process -Force
+
