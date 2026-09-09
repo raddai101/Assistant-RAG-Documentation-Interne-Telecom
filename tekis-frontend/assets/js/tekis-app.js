@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = '/api/v1';
+  const API_BASE = 'http://127.0.0.1:5000/api/v1';
   const TOKEN_KEY = 'tekis_token';
   const USER_KEY = 'tekis_user';
 
@@ -12,23 +12,25 @@
     localStorage.setItem(USER_KEY, JSON.stringify(user));
   }
 
-  function saveChatHistory(role, content) {
-    var history;
-    try {
-      history = JSON.parse(localStorage.getItem('tekis_chat_history') || '[]');
-    } catch (error) {
-      history = [];
-    }
-    history.push({ role: role, content: String(content), at: new Date().toISOString() });
-    localStorage.setItem('tekis_chat_history', JSON.stringify(history.slice(-50)));
+  const ACTIVE_CONVERSATION_KEY = 'tekis_active_conversation_id';
+
+  function getActiveConversationId() {
+    var value = sessionStorage.getItem(ACTIVE_CONVERSATION_KEY);
+    return value ? Number(value) : null;
+  }
+
+  function setActiveConversationId(id) {
+    if (id == null) sessionStorage.removeItem(ACTIVE_CONVERSATION_KEY);
+    else sessionStorage.setItem(ACTIVE_CONVERSATION_KEY, String(id));
+  }
+
+  function saveChatHistory() {
+    // Compatibilité avec d'anciennes versions du frontend : l'historique est
+    // désormais géré exclusivement par PostgreSQL.
   }
 
   function getChatHistory() {
-    try {
-      return JSON.parse(localStorage.getItem('tekis_chat_history') || '[]');
-    } catch (error) {
-      return [];
-    }
+    return [];
   }
 
   function clearStoredSession() {
@@ -113,7 +115,7 @@
         })
         .catch(function (error) {
           var message = error.message === 'Failed to fetch'
-            ? 'API inaccessible. Vérifiez que les services TEKIS sont démarrés.'
+            ? 'API inaccessible. Démarrez le backend sur http://127.0.0.1:5000.'
             : (error.message || 'Connexion impossible.');
           setStatusMessage(message, true);
         })
@@ -153,18 +155,100 @@
     }
   }
 
+  function groupSourcesByDocument(sources) {
+    var grouped = {};
+    (Array.isArray(sources) ? sources : []).forEach(function (source) {
+      var key = String(source.document_version_id || source.document_id || source.original_filename || source.chunk_id || 'source');
+      if (!grouped[key]) {
+        grouped[key] = {
+          document_id: source.document_id,
+          document_version_id: source.document_version_id,
+          document_title: source.document_title,
+          original_filename: source.original_filename,
+          file_type: source.file_type,
+          department_name: source.department_name,
+          pages: [],
+        };
+      }
+      if (source.page != null && grouped[key].pages.indexOf(source.page) === -1) {
+        grouped[key].pages.push(source.page);
+      }
+    });
+    return Object.keys(grouped).map(function (key) { return grouped[key]; });
+  }
+
+  function openDocumentPreview(source) {
+    var modal = document.getElementById('documentPreviewModal');
+    var body = document.getElementById('documentPreviewBody');
+    var title = document.getElementById('documentPreviewTitle');
+    var meta = document.getElementById('documentPreviewMeta');
+    if (!modal || !body || !title || !meta) return;
+
+    var filename = source.original_filename || source.document_title || 'Document TEKIS';
+    title.textContent = filename;
+    meta.textContent = [
+      source.document_title && source.document_title !== filename ? source.document_title : '',
+      source.department_name || '',
+      source.pages && source.pages.length ? 'Page' + (source.pages.length > 1 ? 's ' : ' ') + source.pages.join(', ') : '',
+    ].filter(Boolean).join(' • ');
+    body.innerHTML = '<div class="flex items-center gap-3 text-text-subtle py-8 justify-center"><span class="material-symbols-outlined animate-spin">progress_activity</span><span>Chargement du document…</span></div>';
+    modal.hidden = false;
+    document.body.classList.add('overflow-hidden');
+
+    requestJson('/documents/versions/' + encodeURIComponent(source.document_version_id) + '/preview')
+      .then(function (payload) {
+        var data = (payload && payload.data) || {};
+        var pages = Array.isArray(data.pages) ? data.pages : [];
+        if (!pages.length) {
+          body.innerHTML = '<div class="tk-document-empty">Aucun contenu textuel disponible pour cet aperçu.</div>';
+          return;
+        }
+        body.innerHTML = pages.map(function (page) {
+          var content = escapeHtml(page.content || '').replace(/\n/g, '<br>');
+          return '<section class="tk-preview-page"><div class="tk-preview-page-label">PAGE ' + page.page + '</div><div class="tk-preview-content">' + content + '</div></section>';
+        }).join('');
+        if (data.truncated) {
+          body.insertAdjacentHTML('beforeend', '<div class="tk-preview-notice">Aperçu tronqué pour conserver une consultation fluide. Le document source est intact.</div>');
+        }
+      })
+      .catch(function (error) {
+        body.innerHTML = '<div class="text-red-400 py-8">Impossible d afficher le document : ' + escapeHtml(error.message) + '</div>';
+      });
+  }
+
+  function closeDocumentPreview() {
+    var modal = document.getElementById('documentPreviewModal');
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove('overflow-hidden');
+  }
+
   function formatSources(sources) {
     if (!Array.isArray(sources) || sources.length === 0) {
       return '<div class="text-sm text-text-subtle">Aucune source détectée pour cette réponse.</div>';
     }
 
-    const chips = sources.map(function (source) {
-      const docVersion = source.document_version_id != null ? ' • v' + source.document_version_id : '';
-      const distance = source.distance != null ? ' • score ' + Number(source.distance).toFixed(3) : '';
-      return '<span class="tk-source-chip"><span class="material-symbols-outlined text-[16px]">description</span>chunk #' + (source.chunk_id || 'n/a') + docVersion + distance + '</span>';
+    var grouped = groupSourcesByDocument(sources);
+    var cards = grouped.map(function (source, index) {
+      var filename = source.original_filename || source.document_title || 'Document sans nom';
+      var meta = [
+        source.document_title && source.document_title !== filename ? source.document_title : '',
+        source.department_name || '',
+        source.pages && source.pages.length ? 'page' + (source.pages.length > 1 ? 's ' : ' ') + source.pages.join(', ') : '',
+      ].filter(Boolean).join(' • ');
+
+      return '<button type="button" class="tk-source-card" data-source-index="' + index + '" aria-label="Afficher ' + escapeHtml(filename) + '">' +
+        '<span class="tk-source-icon material-symbols-outlined">description</span>' +
+        '<span class="min-w-0 flex-1 text-left">' +
+          '<span class="tk-source-name">' + escapeHtml(filename) + '</span>' +
+          (meta ? '<span class="tk-source-meta">' + escapeHtml(meta) + '</span>' : '') +
+        '</span>' +
+        '<span class="tk-source-action">Afficher le document</span>' +
+        '<span class="material-symbols-outlined tk-source-chevron">chevron_right</span>' +
+      '</button>';
     }).join('');
 
-    return '<div class="border-t border-border pt-4"><h4 class="tk-label-caps text-text-subtle mb-3">SOURCES UTILISÉES</h4><div class="flex flex-wrap gap-2">' + chips + '</div></div>';
+    return '<div class="border-t border-border pt-4 mt-4"><div class="flex items-center justify-between gap-4 mb-3"><h4 class="tk-label-caps text-text-subtle">SOURCES UTILISÉES</h4><span class="tk-source-hint">Cliquer pour consulter</span></div><div class="tk-source-list" data-source-list>' + cards + '</div></div>';
   }
 
   function renderAnswerParagraphs(value) {
@@ -181,10 +265,25 @@
     const data = (payload && payload.data) || {};
     const answer = data.answer || 'Aucune réponse disponible.';
     const reason = data.reason ? '<p class="tk-body-md text-text-muted mb-4">' + escapeHtml(data.reason) + '</p>' : '';
-    const confidence = data.confidence != null ? '<div class="mt-3 text-xs text-text-subtle">Confiance: ' + Number(data.confidence).toFixed(3) + '</div>' : '';
+    const confidence = data.confidence != null ? '<div class="tk-confidence">Confiance ' + Math.round(Number(data.confidence) * 100) + '%</div>' : '';
     const sources = formatSources(data.sources || []);
 
     addMessage('assistant', '<div class="flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-primary filled">smart_toy</span><span class="tk-label-caps font-bold">ASSISTANT TEKIS</span></div>' + renderAnswerParagraphs(answer) + reason + confidence + sources, 'Réponse générée par le backend TEKIS');
+
+    var container = document.getElementById('chatMessages');
+    var lastAssistant = container ? container.lastElementChild : null;
+    var list = lastAssistant ? lastAssistant.querySelector('[data-source-list]') : null;
+    if (list) {
+      var grouped = groupSourcesByDocument(data.sources || []);
+      list.querySelectorAll('[data-source-index]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          var index = Number(button.getAttribute('data-source-index'));
+          if (grouped[index] && grouped[index].document_version_id != null) {
+            openDocumentPreview(grouped[index]);
+          }
+        });
+      });
+    }
   }
 
   function escapeHtml(value) {
@@ -196,11 +295,189 @@
       .replace(/'/g, '&#039;');
   }
 
+  function createStreamingAssistantMessage() {
+    const container = document.getElementById('chatMessages');
+    if (!container) return null;
+    const wrap = document.createElement('div');
+    wrap.className = 'flex justify-start';
+    const bubble = document.createElement('div');
+    bubble.className = 'tk-bubble-ai';
+    const inner = document.createElement('div');
+    inner.innerHTML = '<div class="flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-primary filled">smart_toy</span><span class="tk-label-caps font-bold">ASSISTANT TEKIS</span></div><div data-stream-answer class="tk-body-lg whitespace-pre-wrap"></div><div data-stream-extra></div>';
+    bubble.appendChild(inner);
+    wrap.appendChild(bubble);
+    container.appendChild(wrap);
+    container.scrollTop = container.scrollHeight;
+    return { wrap: wrap, answer: inner.querySelector('[data-stream-answer]'), extra: inner.querySelector('[data-stream-extra]') };
+  }
+
+  function renderStreamingSources(streamView, sources, confidence, reason) {
+    if (!streamView || !streamView.extra) return;
+    var reasonHtml = reason ? '<p class="tk-body-md text-text-muted mb-4">' + escapeHtml(reason) + '</p>' : '';
+    var confidenceHtml = confidence != null ? '<div class="tk-confidence">Confiance ' + Math.round(Number(confidence) * 100) + '%</div>' : '';
+    streamView.extra.innerHTML = reasonHtml + confidenceHtml + formatSources(sources || []);
+    var grouped = groupSourcesByDocument(sources || []);
+    streamView.extra.querySelectorAll('[data-source-index]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var index = Number(button.getAttribute('data-source-index'));
+        if (grouped[index] && grouped[index].document_version_id != null) openDocumentPreview(grouped[index]);
+      });
+    });
+  }
+
+  function formatConversationDate(value) {
+    if (!value) return '';
+    try {
+      return new Date(value).toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+      });
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function renderConversationNav(conversations) {
+    var container = document.getElementById('conversationNav');
+    if (!container) return;
+    var activeId = getActiveConversationId();
+    var items = (Array.isArray(conversations) ? conversations : []).slice(0, 20);
+    container.innerHTML = items.map(function (conversation) {
+      var active = Number(conversation.id) === Number(activeId);
+      return '<a href="chat.html?conversation_id=' + encodeURIComponent(conversation.id) +
+        '" class="tk-conversation-nav-item' + (active ? ' active' : '') + '">' +
+        '<span class="material-symbols-outlined">chat_bubble</span>' +
+        '<span class="truncate">' + escapeHtml(conversation.title || 'Nouvelle discussion') + '</span>' +
+        '</a>';
+    }).join('');
+  }
+
+  async function loadConversations() {
+    var payload = await requestJson('/conversations');
+    var conversations = payload.data && Array.isArray(payload.data.conversations)
+      ? payload.data.conversations : [];
+    renderConversationNav(conversations);
+    return conversations;
+  }
+
+  function clearChatMessages() {
+    var container = document.getElementById('chatMessages');
+    if (!container) return;
+    container.innerHTML = '<div class="text-center"><span class="tk-label-caps text-text-subtle">DISCUSSION</span></div>';
+  }
+
+  function renderStoredMessage(message) {
+    var content = escapeHtml(message.content || '').replace(/\n/g, '<br>');
+    if (message.role === 'user') {
+      addMessage('user', '<p class="tk-body-lg text-text">' + content + '</p>', '');
+      return;
+    }
+    addMessage('assistant',
+      '<div class="flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-primary filled">smart_toy</span><span class="tk-label-caps font-bold">ASSISTANT TEKIS</span></div>' +
+      renderAnswerParagraphs(message.content || ''),
+      '');
+  }
+
+  async function loadConversation(conversationId) {
+    var payload = await requestJson('/conversations/' + encodeURIComponent(conversationId));
+    var conversation = payload.data || {};
+    setActiveConversationId(conversation.id);
+    clearChatMessages();
+    (conversation.messages || []).forEach(renderStoredMessage);
+    var title = document.querySelector('[data-current-conversation-title]');
+    if (title) title.textContent = conversation.title || 'Discussion';
+    await loadConversations();
+    return conversation;
+  }
+
+  async function streamChat(query, view) {
+    const token = getStoredToken();
+    const response = await fetch(API_BASE + '/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+        ...(token ? { Authorization: 'Bearer ' + token } : {}),
+      },
+      body: JSON.stringify({ query: query, top_k: 5, conversation_id: getActiveConversationId() }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(function () { return {}; });
+      throw new Error(data.error || data.message || 'Erreur de requête');
+    }
+    if (!response.body) throw new Error('Le navigateur ne supporte pas le streaming HTTP.');
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let answer = '';
+    let metadata = {};
+
+    function handleEvent(raw) {
+      var eventName = 'message';
+      var dataText = '';
+      raw.split('\n').forEach(function (line) {
+        if (line.indexOf('event:') === 0) eventName = line.slice(6).trim();
+        if (line.indexOf('data:') === 0) dataText += line.slice(5).trim();
+      });
+      if (!dataText) return;
+      var data;
+      try { data = JSON.parse(dataText); } catch (error) { return; }
+      if (eventName === 'conversation') {
+        if (data.conversation_id != null) {
+          setActiveConversationId(data.conversation_id);
+          loadConversations().catch(function () {});
+        }
+      } else if (eventName === 'metadata') {
+        metadata = data || {};
+        if (metadata.conversation_id != null) {
+          setActiveConversationId(metadata.conversation_id);
+          loadConversations().catch(function () {});
+        }
+        renderStreamingSources(view, metadata.sources || [], metadata.confidence, metadata.reason);
+      } else if (eventName === 'token') {
+        answer += String(data.text || '');
+        view.answer.textContent = answer;
+        const container = document.getElementById('chatMessages');
+        if (container) container.scrollTop = container.scrollHeight;
+      } else if (eventName === 'done') {
+        if (data.answer != null) answer = String(data.answer);
+        view.answer.innerHTML = renderAnswerParagraphs(answer);
+        renderStreamingSources(view, metadata.sources || [], metadata.confidence, metadata.reason);
+      } else if (eventName === 'error') {
+        throw new Error(data.error || 'Erreur pendant la génération');
+      }
+    }
+
+    while (true) {
+      const result = await reader.read();
+      buffer += decoder.decode(result.value || new Uint8Array(), { stream: !result.done });
+      var parts = buffer.split('\n\n');
+      buffer = parts.pop() || '';
+      parts.forEach(handleEvent);
+      if (result.done) break;
+    }
+    if (buffer.trim()) handleEvent(buffer);
+  }
+
   function mountChatPage() {
     const form = document.getElementById('chatForm');
     const messageField = document.getElementById('chatInput');
     const attachmentButton = document.querySelector('[data-context-upload]');
     if (!form) return;
+
+    var previewModal = document.getElementById('documentPreviewModal');
+    var previewClose = document.querySelector('[data-close-document-preview]');
+    if (previewClose) previewClose.addEventListener('click', closeDocumentPreview);
+    if (previewModal) {
+      previewModal.addEventListener('click', function (event) {
+        if (event.target === previewModal) closeDocumentPreview();
+      });
+    }
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeDocumentPreview();
+    });
 
     if (!getStoredToken()) {
       window.location.href = 'login.html';
@@ -216,6 +493,19 @@
     if (userEmail && user && user.email) {
       userEmail.textContent = user.email;
     }
+
+    var params = new URLSearchParams(window.location.search);
+    var requestedConversationId = params.get('conversation_id');
+    var conversationLoad = requestedConversationId
+      ? loadConversation(requestedConversationId)
+      : (function () {
+          setActiveConversationId(null);
+          clearChatMessages();
+          return loadConversations();
+        })();
+    conversationLoad.catch(function (error) {
+      console.error('[TEKIS] Impossible de charger les conversations:', error);
+    });
 
     if (attachmentButton) {
       var fileInput = document.createElement('input');
@@ -252,15 +542,14 @@
       const submitButton = form.querySelector('button[type="submit"]');
       if (submitButton) submitButton.disabled = true;
 
-      requestJson('/chat', {
-        method: 'POST',
-        body: JSON.stringify({ query: query, top_k: 5 }),
-      })
-        .then(function (payload) {
-          renderAssistantReply(payload);
-        })
+      var streamView = createStreamingAssistantMessage();
+      streamChat(query, streamView)
         .catch(function (error) {
-          addMessage('assistant', '<p class="tk-body-md text-text-muted">Erreur: ' + escapeHtml(error.message) + '</p>', 'Backend non disponible');
+          if (streamView && streamView.answer) {
+            streamView.answer.innerHTML = '<p class="tk-body-md text-text-muted">Erreur: ' + escapeHtml(error.message) + '</p>';
+          } else {
+            addMessage('assistant', '<p class="tk-body-md text-text-muted">Erreur: ' + escapeHtml(error.message) + '</p>', 'Backend non disponible');
+          }
         })
         .finally(function () {
           if (submitButton) submitButton.disabled = false;
@@ -288,24 +577,34 @@
     return true;
   }
 
-  function mountHistoryPage() {
+  async function mountHistoryPage() {
     var container = document.getElementById('historyList');
     var emptyState = document.getElementById('historyEmpty');
     if (!container) return;
 
-    var history = getChatHistory();
-    if (!history.length) {
+    try {
+      var conversations = await loadConversations();
+      if (!conversations.length) {
+        if (emptyState) emptyState.hidden = false;
+        return;
+      }
+      if (emptyState) emptyState.hidden = true;
+      container.innerHTML = conversations.map(function (conversation) {
+        var date = formatConversationDate(conversation.updated_at || conversation.created_at);
+        return '<a href="chat.html?conversation_id=' + encodeURIComponent(conversation.id) +
+          '" class="tk-card p-5 block hover:shadow-md transition-shadow">' +
+          '<div class="flex items-center justify-between gap-4 mb-2">' +
+          '<span class="tk-label-caps">DISCUSSION</span>' +
+          '<time class="text-xs text-text-subtle">' + escapeHtml(date) + '</time>' +
+          '</div>' +
+          '<h2 class="font-semibold text-lg text-text mb-1">' + escapeHtml(conversation.title || 'Nouvelle discussion') + '</h2>' +
+          '<p class="tk-body-md text-text-subtle">Ouvrir cette conversation et reprendre l’échange</p>' +
+          '</a>';
+      }).join('');
+    } catch (error) {
       if (emptyState) emptyState.hidden = false;
-      return;
+      if (container) container.innerHTML = '<div class="text-red-400">Impossible de charger l’historique : ' + escapeHtml(error.message) + '</div>';
     }
-    if (emptyState) emptyState.hidden = true;
-    container.innerHTML = history.slice().reverse().map(function (item) {
-      var date = new Date(item.at).toLocaleString('fr-FR');
-      return '<article class="tk-card p-5"><div class="flex items-center justify-between gap-4 mb-2"><span class="tk-label-caps">' +
-        (item.role === 'user' ? 'QUESTION' : 'RÉPONSE TEKIS') +
-        '</span><time class="text-xs text-text-subtle">' + escapeHtml(date) +
-        '</time></div><p class="tk-body-md">' + escapeHtml(item.content) + '</p></article>';
-    }).join('');
   }
 
   function mountDocumentationPage() {

@@ -27,6 +27,7 @@ from app.modules.governance.access_control_service import AccessControlService
 from app.modules.governance.temporal_resolver import TemporalResolver
 
 search_bp = Blueprint("search", __name__)
+_RETRIEVAL_SERVICE_KEY = "tekis_retrieval_service"
 
 
 def _build_retrieval_service(app_config) -> HybridRetrievalService:
@@ -46,6 +47,14 @@ def _build_retrieval_service(app_config) -> HybridRetrievalService:
         default_top_k=app_config.get("RETRIEVAL_TOP_K", 5),
         candidate_k=app_config.get("HYBRID_CANDIDATE_K", 20),
     )
+
+
+def _get_retrieval_service() -> HybridRetrievalService:
+    service = current_app.extensions.get(_RETRIEVAL_SERVICE_KEY)
+    if service is None:
+        service = _build_retrieval_service(current_app.config)
+        current_app.extensions[_RETRIEVAL_SERVICE_KEY] = service
+    return service
 
 
 def _resolve_authorized_version_ids(user, as_of: datetime | None) -> set[int] | None:
@@ -90,7 +99,7 @@ def search():
 
     authorized_ids = _resolve_authorized_version_ids(g.current_user, as_of)
 
-    service = _build_retrieval_service(current_app.config)
+    service = _get_retrieval_service()
     try:
         result = service.search(query, top_k=top_k, authorized_document_version_ids=authorized_ids)
     except OllamaError as e:

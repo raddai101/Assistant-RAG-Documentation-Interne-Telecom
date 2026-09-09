@@ -11,6 +11,7 @@ Phase 1 (memoire.md §19).
 import json
 import urllib.error
 import urllib.request
+from collections.abc import Iterator
 
 
 class OllamaError(RuntimeError):
@@ -115,3 +116,41 @@ class OllamaLLMClient:
                 f"Réponse Ollama sans champ 'response' pour le modèle {self._model}."
             )
         return body["response"]
+
+    def stream(self, prompt: str) -> Iterator[str]:
+        """Génère la réponse en flux continu depuis Ollama (JSONL)."""
+        data = json.dumps({
+            "model": self._model,
+            "prompt": prompt,
+            "stream": True,
+            "options": self._options,
+        }).encode("utf-8")
+        request = urllib.request.Request(
+            f"{self._base_url}/api/generate",
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self._timeout) as response:
+                for raw_line in response:
+                    line = raw_line.decode("utf-8").strip()
+                    if not line:
+                        continue
+                    try:
+                        body = json.loads(line)
+                    except json.JSONDecodeError as e:
+                        raise OllamaError("Flux Ollama invalide (JSON attendu).") from e
+                    if body.get("error"):
+                        raise OllamaError(str(body["error"]))
+                    token = body.get("response")
+                    if token:
+                        yield token
+                    if body.get("done"):
+                        break
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode("utf-8", errors="replace")
+            raise OllamaError(f"Ollama a renvoyé HTTP {e.code} : {detail}") from e
+        except urllib.error.URLError as e:
+            raise OllamaError(f"Ollama injoignable sur {self._base_url} : {e}") from e
+

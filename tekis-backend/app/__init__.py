@@ -68,6 +68,7 @@ def _register_blueprints(app: Flask) -> None:
     from app.api.embeddings import embeddings_bp
     from app.api.search import search_bp
     from app.api.chat import chat_bp
+    from app.api.conversations import conversations_bp
     from app.api.graph import graph_bp
     from app.api.auth import auth_bp
     from app.api.change_intelligence import change_intelligence_bp
@@ -80,6 +81,7 @@ def _register_blueprints(app: Flask) -> None:
     app.register_blueprint(embeddings_bp, url_prefix="/api/v1/embeddings")
     app.register_blueprint(search_bp, url_prefix="/api/v1/search")
     app.register_blueprint(chat_bp, url_prefix="/api/v1/chat")
+    app.register_blueprint(conversations_bp, url_prefix="/api/v1/conversations")
     app.register_blueprint(graph_bp, url_prefix="/api/v1/graph")
     app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
     app.register_blueprint(change_intelligence_bp, url_prefix="/api/v1/change-intelligence")

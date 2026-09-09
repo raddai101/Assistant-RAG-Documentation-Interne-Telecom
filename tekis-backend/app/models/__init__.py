@@ -7,6 +7,7 @@ from app.models.identity import Department, Role, User  # noqa: F401
 from app.models.document import Document, DocumentVersion, Permission, DocumentStatus  # noqa: F401
 from app.models.chunk import Chunk, ChunkEmbeddingMeta  # noqa: F401
 from app.models.audit import AuditLog, Session, Feedback  # noqa: F401
+from app.models.conversation import Conversation, ChatMessage  # noqa: F401
 
 __all__ = [
     "Department",
@@ -21,4 +22,6 @@ __all__ = [
     "AuditLog",
     "Session",
     "Feedback",
+    "Conversation",
+    "ChatMessage",
 ]

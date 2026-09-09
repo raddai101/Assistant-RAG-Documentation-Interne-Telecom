@@ -37,9 +37,9 @@ class BaseConfig:
     CHROMA_COLLECTION_NAME = os.environ.get(
         "CHROMA_COLLECTION_NAME", "tekis_enterprise_kb"
     )
-    RETRIEVAL_TOP_K = int(os.environ.get("RETRIEVAL_TOP_K", "10"))
+    RETRIEVAL_TOP_K = int(os.environ.get("RETRIEVAL_TOP_K", "5"))
     RERANKER_MODEL_NAME = os.environ.get("RERANKER_MODEL_NAME", "BAAI/bge-reranker-v2-m3")
-    HYBRID_CANDIDATE_K = int(os.environ.get("HYBRID_CANDIDATE_K", "50"))
+    HYBRID_CANDIDATE_K = int(os.environ.get("HYBRID_CANDIDATE_K", "20"))
     # Seuil de confiance sous lequel GenerationService s'abstient plutôt que de
     # générer une réponse (Phase 6, memoire.md §29). Première estimation non
     # calibrée, faute d'accès à un reranker réel dans l'environnement de

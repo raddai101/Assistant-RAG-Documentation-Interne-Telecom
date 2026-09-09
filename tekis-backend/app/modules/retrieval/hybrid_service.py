@@ -17,8 +17,13 @@ implicite — voir memoire.md §24.
 from app.modules.generation.contracts import EmbeddingClient
 from app.modules.retrieval.contracts import VectorSearchResult, VectorStoreContract
 from app.modules.retrieval.service import RetrievalResult
+from app.modules.retrieval.repository import RetrievalRepository
 from app.modules.retrieval.lexical.contracts import LexicalSearchContract
 from app.modules.retrieval.reranker.contracts import RerankCandidate, RerankerContract
+import logging
+import time
+
+logger = logging.getLogger(__name__)
 from app.modules.retrieval.fusion import reciprocal_rank_fusion
 
 
@@ -36,6 +41,7 @@ class HybridRetrievalService:
         self._vector_store = vector_store
         self._lexical_search = lexical_search
         self._reranker = reranker
+        self._repository = RetrievalRepository()
         self._default_top_k = default_top_k
         self._candidate_k = candidate_k
 
@@ -62,13 +68,21 @@ class HybridRetrievalService:
             else None
         )
 
+        started = time.perf_counter()
         query_embedding = self._embedding_client.embed([query])[0]
+        logger.info("[PERF] embedding query: %.3fs", time.perf_counter() - started)
+
+        started = time.perf_counter()
         vector_matches = self._vector_store.search(
             query_embedding, top_k=self._candidate_k, where=where
         )
+        logger.info("[PERF] recherche vectorielle: %.3fs (%d résultats)", time.perf_counter() - started, len(vector_matches))
+
+        started = time.perf_counter()
         lexical_matches = self._lexical_search.search(
             query, top_k=self._candidate_k, document_version_ids=version_ids_list
         )
+        logger.info("[PERF] recherche lexicale: %.3fs (%d résultats)", time.perf_counter() - started, len(lexical_matches))
 
         vector_ranked = [
             (match.metadata.get("chunk_id"), match.document, match.metadata)
@@ -85,15 +99,21 @@ class HybridRetrievalService:
             RerankCandidate(chunk_id=f.chunk_id, content=f.content, metadata=f.metadata)
             for f in fused[: self._candidate_k]
         ]
+        started = time.perf_counter()
         reranked = self._reranker.rerank(query, candidates, top_k=final_top_k)
+        logger.info("[PERF] reranker: %.3fs (%d candidats -> %d résultats)", time.perf_counter() - started, len(candidates), len(reranked))
 
-        results = [
-            VectorSearchResult(
-                id=f"chunk-{r.chunk_id}",
-                document=r.content,
-                metadata={**r.metadata, "chunk_id": r.chunk_id},
-                distance=r.score,
+        source_metadata = self._repository.get_source_metadata([r.chunk_id for r in reranked])
+        results = []
+        for r in reranked:
+            metadata = {**r.metadata, "chunk_id": r.chunk_id}
+            metadata.update(source_metadata.get(r.chunk_id, {}))
+            results.append(
+                VectorSearchResult(
+                    id=f"chunk-{r.chunk_id}",
+                    document=r.content,
+                    metadata=metadata,
+                    distance=r.score,
+                )
             )
-            for r in reranked
-        ]
         return RetrievalResult(results=results)

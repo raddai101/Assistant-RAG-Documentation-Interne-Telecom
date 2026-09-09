@@ -62,4 +62,4 @@ EXPOSE 5000
 # Démarrage
 # ============================================================
 
-CMD ["sh", "-c", "flask db upgrade && gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 300 run:app"]
+CMD ["sh", "-c", "flask db upgrade && gunicorn --bind 0.0.0.0:5000 --workers ${GUNICORN_WORKERS:-1} --timeout 300 run:app"]

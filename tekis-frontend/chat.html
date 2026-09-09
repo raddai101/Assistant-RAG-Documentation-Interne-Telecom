@@ -28,7 +28,10 @@
   </div>
   <div class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-1">
     <a href="chat.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">add_comment</span>Nouvelle Discussion</a>
-    <a href="historique.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">history</span>Historique</a>
+    <div id="conversationNav" class="tk-conversation-nav">
+      <div class="tk-conversation-nav-label">Discussions récentes</div>
+    </div>
+    <a href="historique.html" data-nav-link class="tk-nav-link mt-1"><span class="material-symbols-outlined">history</span>Historique</a>
     <a href="documentation.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">description</span>Documentation</a>
     <a href="parametres.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">settings</span>Paramètres</a>
     <a href="administration.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">admin_panel_settings</span>Administration</a>
@@ -67,7 +70,23 @@
     </div>
   </main>
 
-  <div class="absolute bottom-0 left-0 w-full pt-10 pb-6 px-margin-mobile md:px-gutter"
+  <div id="documentPreviewModal" class="tk-document-modal" hidden role="dialog" aria-modal="true" aria-labelledby="documentPreviewTitle">
+  <div class="tk-document-modal-panel">
+    <div class="tk-document-modal-header">
+      <div class="min-w-0">
+        <div class="tk-label-caps text-text-subtle mb-1">DOCUMENT SOURCE</div>
+        <h2 id="documentPreviewTitle" class="tk-document-title">Document TEKIS</h2>
+        <p id="documentPreviewMeta" class="tk-document-meta"></p>
+      </div>
+      <button type="button" class="tk-icon-btn" data-close-document-preview aria-label="Fermer l'aperçu">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div id="documentPreviewBody" class="tk-document-modal-body"></div>
+  </div>
+</div>
+
+<div class="absolute bottom-0 left-0 w-full pt-10 pb-6 px-margin-mobile md:px-gutter"
        style="background: linear-gradient(to top, var(--color-bg) 60%, transparent);">
     <div class="tk-chat-container">
       <form id="chatForm" class="tk-input-wrap items-end" style="padding-left:0;">

@@ -28,7 +28,10 @@
   </div>
   <div class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-1">
     <a href="chat.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">add_comment</span>Nouvelle Discussion</a>
-    <a href="historique.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">history</span>Historique</a>
+    <div id="conversationNav" class="tk-conversation-nav">
+      <div class="tk-conversation-nav-label">Discussions récentes</div>
+    </div>
+    <a href="historique.html" data-nav-link class="tk-nav-link mt-1"><span class="material-symbols-outlined">history</span>Historique</a>
     <a href="documentation.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">description</span>Documentation</a>
     <a href="parametres.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">settings</span>Paramètres</a>
     <a href="administration.html" data-nav-link class="tk-nav-link"><span class="material-symbols-outlined">admin_panel_settings</span>Administration</a>
@@ -61,7 +64,7 @@
   <div class="max-w-[900px] mx-auto w-full">
     <div class="mb-8">
       <h1 class="tk-headline-lg">Historique des discussions</h1>
-      <p class="tk-body-lg text-text-subtle">Les échanges enregistrés dans ce navigateur.</p>
+      <p class="tk-body-lg text-text-subtle">Toutes vos discussions enregistrées dans TEKIS.</p>
     </div>
     <div id="historyList" class="flex flex-col gap-4"></div>
     <div id="historyEmpty" class="tk-empty mx-auto text-center items-center" hidden>

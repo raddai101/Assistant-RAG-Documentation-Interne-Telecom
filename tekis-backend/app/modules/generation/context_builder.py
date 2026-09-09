@@ -19,8 +19,9 @@ from app.modules.retrieval.contracts import VectorSearchResult
 PROMPT_TEMPLATE = """Tu es l'assistant documentaire interne d'une entreprise de télécommunications.
 Réponds à la question UNIQUEMENT à partir des extraits et des relations de graphe et de la recherche semantique.
 Cette question peut nécessiter plusieurs documents : recoupe explicitement les faits,
-reconstitue la chaîne Projet en parcourant l'ensemble de mon corpus, et cite les
-identifiants ou noms des documents utilisés. Ne conclus pas qu'une information est absente
+reconstitue la chaîne Projet en parcourant l'ensemble de mon corpus, et cite uniquement
+les noms/titres de documents fournis dans les métadonnées. N'affiche jamais les chunk_id,
+identifiants de vecteurs, IDs techniques ou références numériques internes. Ne conclus pas qu'une information est absente
 avant d'avoir parcouru tous les extraits et relations entret documents. Si les preuves restent
 insuffisantes, dis précisément quelle étape manque — n'invente jamais de contenu.
 Les FAITS STRUCTURÉS PRIORITAIRES DU KNOWLEDGE GRAPH font foi pour les valeurs
@@ -28,6 +29,9 @@ relationnelles et les SLA.
 
 Extraits :
 {context}
+
+Historique de la discussion :
+{history}
 
 Question : {query}
 
@@ -37,10 +41,19 @@ Réponse :"""
 def build_context(results: list[VectorSearchResult], extra_context: str | None = None) -> str:
     blocks = []
     for i, r in enumerate(results, start=1):
-        chunk_id = r.metadata.get("chunk_id")
+        document_name = (
+            r.metadata.get("original_filename")
+            or r.metadata.get("document_title")
+            or "Document sans nom"
+        )
+        version = r.metadata.get("version")
         page = r.metadata.get("page")
-        location = f"chunk_id={chunk_id}" + (f", page={page}" if page else "")
-        blocks.append(f"[Extrait {i} | {location}]\n{r.document}")
+        location = document_name
+        if version is not None:
+            location += f" — version {version}"
+        if page is not None:
+            location += f", page {page}"
+        blocks.append(f"[Document {i} | {location}]\n{r.document}")
     context = "\n\n".join(blocks)
     if extra_context:
         context = (
@@ -53,5 +66,26 @@ def build_context(results: list[VectorSearchResult], extra_context: str | None =
     return context
 
 
-def build_prompt(query: str, results: list[VectorSearchResult], extra_context: str | None = None) -> str:
-    return PROMPT_TEMPLATE.format(context=build_context(results, extra_context), query=query)
+def build_prompt(
+    query: str,
+    results: list[VectorSearchResult],
+    extra_context: str | None = None,
+    conversation_history: list[dict] | None = None,
+) -> str:
+    context = build_context(results, extra_context)
+    history = "Aucun historique disponible."
+    if conversation_history:
+        lines = []
+        for item in conversation_history[-12:]:
+            role = "Utilisateur" if item.get("role") == "user" else "Assistant TEKIS"
+            content = str(item.get("content") or "").strip()
+            if content:
+                lines.append(f"{role} : {content}")
+        if lines:
+            history = "\n".join(lines)
+
+    return PROMPT_TEMPLATE.format(
+        context=context,
+        history=history,
+        query=query,
+    )
