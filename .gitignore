@@ -14,6 +14,11 @@ corpus/enterprise/
 private.txt
 commandes.txt
 
+# ==============================
+# Database dumps / exports
+# ==============================
+*.sql
+*.dump
 
 # ==============================
 # ENVIRONNEMENT PYTHON

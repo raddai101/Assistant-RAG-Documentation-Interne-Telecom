@@ -1,70 +1,98 @@
-"""
-Métriques d'évaluation (Phase 8, memoire.md §2 objectif 9). Fonctions pures, sans
-dépendance DB/réseau — testables indépendamment de toute infrastructure, cohérent
-avec la stratégie de tests du projet (§16 : jamais de données réelles confidentielles,
-donc l'évaluation elle-même doit pouvoir tourner sur un corpus synthétique).
-
-**Portée assumée, à ne pas surinterpréter** : les métriques de « grounding » et
-« hallucination » implémentées ici (`keyword_coverage`) sont des **proxys lexicaux
-simples** (couverture de mots-clés attendus dans la réponse), pas une évaluation
-sémantique par un juge LLM. Une évaluation plus fine nécessiterait un juge LLM dédié
-et un corpus de référence annoté — hors périmètre de cette livraison, signalé ici
-plutôt que développé spontanément (§3 des instructions : ne pas anticiper une
-fonctionnalité non demandée).
-"""
+"""Métriques pures du benchmark TEKIS."""
+import math
+import re
+from typing import Iterable
 
 
 def precision_at_k(retrieved_ids: list[int], relevant_ids: set[int], k: int) -> float:
-    """Retrieval — fraction des k premiers résultats retournés qui sont pertinents."""
     if k <= 0:
         return 0.0
     top_k = retrieved_ids[:k]
-    if not top_k:
-        return 0.0
-    hits = sum(1 for cid in top_k if cid in relevant_ids)
-    return hits / len(top_k)
+    return (sum(cid in relevant_ids for cid in top_k) / len(top_k)) if top_k else 0.0
 
 
 def recall_at_k(retrieved_ids: list[int], relevant_ids: set[int], k: int) -> float:
-    """Retrieval — fraction des chunks pertinents effectivement retrouvés dans le
-    top-k. 0.0 si aucun chunk pertinent n'était attendu (question mal définie)."""
     if not relevant_ids:
         return 0.0
-    top_k = retrieved_ids[:k]
-    hits = sum(1 for cid in top_k if cid in relevant_ids)
-    return hits / len(relevant_ids)
+    return sum(cid in relevant_ids for cid in retrieved_ids[:k]) / len(relevant_ids)
 
 
 def reciprocal_rank(retrieved_ids: list[int], relevant_ids: set[int]) -> float:
-    """Retrieval — 1/rang du premier résultat pertinent (0.0 si aucun)."""
-    for rank, cid in enumerate(retrieved_ids, start=1):
+    for rank, cid in enumerate(retrieved_ids, 1):
         if cid in relevant_ids:
             return 1.0 / rank
     return 0.0
 
 
+def ndcg_at_k(retrieved_ids: list[int], relevance_grades: dict[int, float], k: int) -> float:
+    if k <= 0 or not relevance_grades:
+        return 0.0
+    dcg = sum((2 ** max(float(relevance_grades.get(cid, 0.0)), 0.0) - 1) / math.log2(rank + 1)
+              for rank, cid in enumerate(retrieved_ids[:k], 1))
+    ideal = sorted((max(float(v), 0.0) for v in relevance_grades.values()), reverse=True)[:k]
+    idcg = sum((2 ** grade - 1) / math.log2(rank + 1) for rank, grade in enumerate(ideal, 1))
+    return dcg / idcg if idcg else 0.0
+
+
 def keyword_coverage(answer: str | None, expected_keywords: list[str]) -> float:
-    """Proxy de grounding/hallucination : fraction des mots-clés attendus présents
-    dans la réponse (insensible à la casse). Ne prouve pas la véracité factuelle —
-    seulement la présence lexicale des faits attendus."""
     if not expected_keywords:
-        return 1.0  # rien n'était attendu -> trivialement "couvert"
+        return 1.0
     if not answer:
         return 0.0
-    answer_lower = answer.lower()
-    hits = sum(1 for kw in expected_keywords if kw.lower() in answer_lower)
-    return hits / len(expected_keywords)
+    text = answer.casefold()
+    return sum(kw.casefold() in text for kw in expected_keywords) / len(expected_keywords)
 
 
 def abstention_correctness(expected_abstain: bool, actual_abstained: bool) -> bool:
-    """Abstention — la décision d'abstenir (ou non) était-elle la bonne ?"""
     return expected_abstain == actual_abstained
 
 
 def acl_leak_count(source_document_version_ids: list[int], forbidden_version_ids: set[int]) -> int:
-    """Sécurité — nombre de sources renvoyées appartenant à une version de document
-    interdite pour l'utilisateur. Doit toujours valoir 0 : un document interdit ne
-    doit jamais atteindre le contexte du LLM (§17/§15 des instructions permanentes)."""
-    if not forbidden_version_ids:
+    return sum(vid in forbidden_version_ids for vid in source_document_version_ids) if forbidden_version_ids else 0
+
+
+def citation_metrics(answer: str | None, expected_citations: Iterable[str]) -> tuple[float, float, float]:
+    expected = [str(x).casefold() for x in expected_citations if str(x).strip()]
+    if not expected:
+        return 1.0, 1.0, 1.0
+    text = (answer or "").casefold()
+    hits = sum(c in text for c in expected)
+    precision = hits / max(1, _citation_mentions(answer))
+    recall = hits / len(expected)
+    completeness = recall
+    return min(precision, 1.0), recall, completeness
+
+
+def _citation_mentions(answer: str | None) -> int:
+    if not answer:
         return 0
-    return sum(1 for vid in source_document_version_ids if vid in forbidden_version_ids)
+    # Human-readable citation names are expected; numeric-only IDs are not counted.
+    matches = re.findall(r"(?:source|document|réf(?:érence)?|citation)\s*[:#-]?\s*([^\n.;]+)", answer, re.I)
+    return max(1, len(matches)) if matches else 0
+
+
+def version_metrics(source_version_ids: list[int], expected_version_ids: Iterable[int]) -> tuple[float, float]:
+    expected = set(expected_version_ids)
+    actual = set(source_version_ids)
+    if not expected:
+        return 1.0, 1.0
+    precision = len(actual & expected) / len(actual) if actual else 0.0
+    recall = len(actual & expected) / len(expected)
+    return precision, recall
+
+
+def faithfulness_score(answer: str | None, expected_keywords: list[str]) -> float:
+    """Proxy déterministe : couverture des faits attendus.
+    Un vrai juge sémantique peut remplacer cette fonction sans changer le contrat."""
+    return keyword_coverage(answer, expected_keywords)
+
+
+def answer_relevance_score(answer: str | None, expected_keywords: list[str]) -> float:
+    return keyword_coverage(answer, expected_keywords)
+
+
+def hallucination_rate(answer: str | None, expected_keywords: list[str]) -> float:
+    if not answer:
+        return 0.0
+    # Proxy conservateur : manque de couverture des faits attendus, pas preuve de hallucination.
+    return 1.0 - keyword_coverage(answer, expected_keywords)

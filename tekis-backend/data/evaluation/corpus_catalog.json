@@ -1,0 +1,398 @@
+{
+  "source": "tekis_db.sql (reconstructed from tekis_db.dump)",
+  "documents": 65,
+  "document_versions": 65,
+  "chunks": 337,
+  "documents_list": [
+    {
+      "document_id": 1,
+      "title": "Commercial Acquisition Abonnés",
+      "department_id": 1,
+      "classification": null
+    },
+    {
+      "document_id": 2,
+      "title": "DOC22_Commercial_Partenariats_Entreprises",
+      "department_id": 1,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 3,
+      "title": "DOC34_Commercial_Brief_Argumentaire_5G",
+      "department_id": 1,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 4,
+      "title": "DOC41_Commercial_Suivi_Abonnes_2025_2026 (1)",
+      "department_id": 1,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 5,
+      "title": "Dossier_Partenariat_B2B_TelcoAI",
+      "department_id": 1,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 6,
+      "title": "Strategie_Commerciale_Annuelle_TelcoAI",
+      "department_id": 1,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 7,
+      "title": "DOC05_CoreNetwork_VoLTE_5GCore",
+      "department_id": 2,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 8,
+      "title": "DOC17_CoreNetwork_Gestion_Abonnes",
+      "department_id": 2,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 9,
+      "title": "DOC09_Cybersecurite_Projet_Bouclier",
+      "department_id": 3,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 10,
+      "title": "DOC21_Cybersecurite_Protection_Donnees_Abonnes",
+      "department_id": 3,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 11,
+      "title": "DOC21_Cybersecurite_Protection_Donnees_Abonnes_V2",
+      "department_id": 3,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 12,
+      "title": "DOC43_Audit_Securite_Externe_NzuriCyberAudit (1)",
+      "department_id": 3,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 13,
+      "title": "Politique_Cybersecurite_Telecom_TelcoAI",
+      "department_id": 3,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 14,
+      "title": "Rapport_Incident_Securite_DDoS_TelcoAI",
+      "department_id": 3,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 15,
+      "title": "DOC01_Company_Bible",
+      "department_id": 4,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 16,
+      "title": "DOC03_Rapport_Strategique",
+      "department_id": 4,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 17,
+      "title": "DOC03_Rapport_Strategique_V2",
+      "department_id": 4,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 18,
+      "title": "DOC15_DG_Positionnement_Concurrentiel",
+      "department_id": 4,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 19,
+      "title": "DOC44_DG_Compte_Rendu_Reunion_Janvier2027",
+      "department_id": 4,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 20,
+      "title": "Analyse_Rentabilite_5G_TelcoAI",
+      "department_id": 5,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 21,
+      "title": "DOC12_Finance_Budget_CAPEX",
+      "department_id": 5,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 22,
+      "title": "DOC24_Finance_Rentabilite_Infrastructures",
+      "department_id": 5,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 23,
+      "title": "DOC36_Finance_Suivi_FTTH_T4_2025",
+      "department_id": 5,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 24,
+      "title": "DOC40_Finance_Suivi_CAPEX_2026 (1)",
+      "department_id": 5,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 25,
+      "title": "Rapport_CAPEX_Annuel_TelcoAI",
+      "department_id": 5,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 26,
+      "title": "DOC08_IA_Projet_Radar",
+      "department_id": 6,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 27,
+      "title": "DOC20_IA_Detection_Fraude_Telecom",
+      "department_id": 6,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 28,
+      "title": "DOC14_Juridique_Licences_Frequences",
+      "department_id": 7,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 29,
+      "title": "DOC26_Juridique_Accords_Interconnexion",
+      "department_id": 7,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 30,
+      "title": "DOC38_Juridique_Attestation_Licence_Frequences",
+      "department_id": 7,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 31,
+      "title": "DOC42_Accord_Itinerance_Nationale_Kivu_Access (1)",
+      "department_id": 7,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 32,
+      "title": "Politique_Conformite_Reglementaire_TelcoAI",
+      "department_id": 7,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 33,
+      "title": "Procedure_Gestion_Licences_Spectre_TelcoAI",
+      "department_id": 7,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 34,
+      "title": "DOC11_Marketing_Campagne_5G_Lubumbashi",
+      "department_id": 8,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 35,
+      "title": "DOC23_Marketing_Etude_Marche_Concurrentiel",
+      "department_id": 8,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 36,
+      "title": "DOC29_Marketing_Communique_Presse_5G_Lubumbashi (1)",
+      "department_id": 8,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 37,
+      "title": "DOC35_Marketing_Rapport_FTTH_T4_2025",
+      "department_id": 8,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 38,
+      "title": "Etude_Segmentation_Abonnes_TelcoAI",
+      "department_id": 8,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 39,
+      "title": "Strategie_Marketing_Lancement_5G_TelcoAI",
+      "department_id": 8,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 40,
+      "title": "DOC07_NOC_Gestion_Incidents",
+      "department_id": 9,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 41,
+      "title": "DOC19_NOC_Rapport_Incident_Fibre_Kinshasa_Matadi",
+      "department_id": 9,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 42,
+      "title": "DOC31_NOC_Incident_KIN_GNB_001",
+      "department_id": 9,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 43,
+      "title": "DOC32_NOC_Catalogue_Codes_Alarme",
+      "department_id": 9,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 44,
+      "title": "DOC39_NOC_Journal_Astreinte_Mars2026",
+      "department_id": 9,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 45,
+      "title": "DOC45_NOC_Export_Tickets_Mars2026",
+      "department_id": 9,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 46,
+      "title": "Plan_Continuite_Activites_TelcoAI",
+      "department_id": 10,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 47,
+      "title": "Procedure_Coordination_Incident_Majeur_TelcoAI",
+      "department_id": 10,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 48,
+      "title": "DOC13_RH_Formation_Techniciens",
+      "department_id": 11,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 49,
+      "title": "DOC25_RH_Recrutement_Ingenieurs_Reseau",
+      "department_id": 11,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 50,
+      "title": "DOC30_Note_Service_Habilitation_Acces (1)",
+      "department_id": 11,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 51,
+      "title": "Guide_Resolution_Internet_Mobile_TelcoAI",
+      "department_id": 11,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 52,
+      "title": "Procedure_Recrutement_Ingenieur_Radio_TelcoAI",
+      "department_id": 11,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 53,
+      "title": "Guide_Integration_Nouveaux_Employes_TelcoAI",
+      "department_id": 12,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 54,
+      "title": "Politique_SLA_TelcoAI",
+      "department_id": 12,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 55,
+      "title": "DOC02_Architecture_Reseau",
+      "department_id": 13,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 56,
+      "title": "DOC04_DTR_Optimisation_Radio",
+      "department_id": 13,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 57,
+      "title": "DOC16_DTR_Capacite_Densification",
+      "department_id": 13,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 58,
+      "title": "DOC27_DTR_Registre_Sites_Equipements",
+      "department_id": 13,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 59,
+      "title": "DOC28_Contrat_Fourniture_Konga_Systems",
+      "department_id": 13,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 60,
+      "title": "DOC37_NOC_Tableau_Bord_KPI_Reseau_Fevrier2026",
+      "department_id": 13,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 61,
+      "title": "DOC06_Transmission_Maintenance_Fibre",
+      "department_id": 14,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 62,
+      "title": "DOC18_Transmission_Rapport_Disponibilite_T4_2025",
+      "department_id": 14,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 63,
+      "title": "DOC33_Transmission_Registre_Circuits_MPLS",
+      "department_id": 14,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 64,
+      "title": "Articles tekis",
+      "department_id": 6,
+      "classification": "enterprise"
+    },
+    {
+      "document_id": 65,
+      "title": "readme",
+      "department_id": null,
+      "classification": "chat-context"
+    }
+  ]
+}

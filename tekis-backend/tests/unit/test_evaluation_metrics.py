@@ -75,3 +75,10 @@ def test_acl_leak_count_zero_when_no_forbidden_ids_defined():
 
 def test_acl_leak_count_zero_when_no_leak():
     assert metrics.acl_leak_count([1, 3], {2}) == 0
+
+
+def test_ndcg_at_k_perfect_ranking():
+    assert metrics.ndcg_at_k([1, 2], {1: 3, 2: 2}, 2) == 1.0
+
+def test_ndcg_at_k_penalizes_bad_order():
+    assert metrics.ndcg_at_k([2, 1], {1: 3, 2: 2}, 2) < 1.0

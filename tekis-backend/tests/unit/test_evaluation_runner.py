@@ -94,3 +94,15 @@ def test_run_empty_questions_list_returns_zeroed_report():
 
     assert report.num_questions == 0
     assert report.results == []
+
+
+def test_run_parallel_executes_all_questions():
+    import threading
+    q = [EvalQuestion(id=f"q{i}", question=f"Question {i}", expected_chunk_ids=[i]) for i in range(4)]
+    class ParallelFake(FakeVariantRunner):
+        def run(self, question):
+            import time
+            time.sleep(0.01)
+            return VariantOutcome(answer="ok", abstained=False, retrieved_chunk_ids=[question.id == "q0" and 0 or int(question.id[1:])])
+    reports = EvaluationRunner({PipelineVariant.B_RAG: ParallelFake({x.id: VariantOutcome(answer="ok", abstained=False, retrieved_chunk_ids=[i]) for i,x in enumerate(q)})}, max_workers=2).run(q)
+    assert reports[PipelineVariant.B_RAG].num_questions == 4
