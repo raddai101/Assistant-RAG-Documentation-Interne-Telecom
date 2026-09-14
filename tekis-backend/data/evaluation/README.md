@@ -1,35 +1,17 @@
-# TEKIS — Dataset d'évaluation reconstruit
+# TEKIS — extraction structurée et dataset préparé
 
-Source de vérité : `tekis_db.sql`, extrait du dump PostgreSQL `tekis_db.dump`.
+{
+  "documents": 65,
+  "chunks": 337,
+  "questions": 180,
+  "categories": {
+    "factual": 130,
+    "multi_chunk": 20,
+    "memory_context": 10,
+    "abstention": 10,
+    "citation_version": 10
+  },
+  "versions": 65
+}
 
-## Corpus
-
-- Documents : 65
-- Versions documentaires : 65
-- Chunks : 337
-
-## Questions
-
-Total : 180
-
-Répartition :
-- factual : 120
-- multi_chunk : 20
-- kg : 10
-- memory_context : 10
-- abstention : 10
-- citation_version : 10
-
-## Principe
-
-Les questions factuelles et multi-chunks sont ancrées dans les contenus réels de la table `chunks`.
-Les questions KG utilisent plusieurs sources documentaires.
-Les questions de mémoire utilisent explicitement un `conversation_history`.
-Les questions d'abstention sont volontairement hors corpus.
-Les questions citation/version vérifient les métadonnées de provenance.
-
-## Statut
-
-`gold_candidate` : dataset reconstruit et contrôlé structurellement, mais une relecture humaine finale reste recommandée avant publication académique.
-
-Le benchmark A→G ne doit être lancé qu'après cette validation finale.
+**Important :** les 180 questions sont des candidats ancrés dans les chunks réels et marqués `candidate_review`. Elles doivent être relues/validées avant le benchmark scientifique final. Les questions d’abstention sont volontairement hors corpus.
